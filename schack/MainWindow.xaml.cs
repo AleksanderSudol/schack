@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,16 +19,19 @@ namespace schack
     public partial class MainWindow : Window
     {
         private Button[,] squares = new Button[8, 8];
+        private Piece[,] board = new Piece[8, 8];
         public MainWindow()
         {
            
             InitializeComponent();
-            createchessboard();
-            DeployPieces(); 
+            createChessboard();
+            InitializeGame();
+            RefreshBoard();
+
 
 
         }
-        private void createchessboard()
+        private void createChessboard()
         {
             for (int row = 0; row < 8; row++)
             {
@@ -48,41 +52,65 @@ namespace schack
 
                     chessboard.Children.Add(square);
 
-                    squares[row, col] = square;  
+                    squares[row, col] = square;
+                }
+            }
+            }
+        private void RefreshBoard()
+        {
+            for (int row = 0; row < 8; row++)
+            {
+                for (int col = 0; col < 8; col++)
+                {
+                    if (board[row, col] != null)
+                    {
+                        // placerar ut symbolen
+                        squares[row, col].Content = board[row, col].Symbol;
+                    }
+                    else
+                    {
+                        // toma rutor
+                        squares[row, col].Content = "";
+                    }
                 }
             }
         }
-            private void DeployPieces()
+        private void InitializeGame()
         {
-            // placera ut svarta pjäser som inte är bönder
-            squares[0, 0].Content = "♜";
-            squares[0, 1].Content = "♞";
-            squares[0, 2].Content = "♝";
-            squares[0, 3].Content = "♛";
-            squares[0, 4].Content = "♚";
-            squares[0, 5].Content = "♝";
-            squares[0, 6].Content = "♞";
-            squares[0, 7].Content = "♜";
+            // Black Pieces
+   
 
-            // placera ut svarta bönder
+            board[0, 0] = new Rook("Black", 0, 0);
+            board[0, 1] = new Knight("Black", 0, 1);
+            board[0, 2] = new Bishop("Black", 0, 2);
+            board[0, 3] = new Queen("Black", 0, 3);
+            board[0, 4] = new King("Black", 0, 4);
+            board[0, 5] = new Bishop("Black", 0, 5);
+            board[0, 6] = new Knight("Black", 0, 6);
+            board[0, 7] = new Rook("Black", 0, 7);
+
+            // placerar ut alla svarta bönder dynamiskt
             for (int col = 0; col < 8; col++)
-                squares[1, col].Content = "♟";
+            {
+                board[1, col] = new Pawn("Black", 1, col);
+            }
 
-            // placera ut vita bönder
+            board[7, 0] = new Rook("White", 7, 0);
+            board[7, 1] = new Knight("White", 7, 1);
+            board[7, 2] = new Bishop("White", 7, 2);
+            board[7, 3] = new Queen("White", 7, 3);
+            board[7, 4] = new King("White", 7, 4);
+            board[7, 5] = new Bishop("White", 7, 5);
+            board[7, 6] = new Knight("White", 7, 6);
+            board[7, 7] = new Rook("White", 7, 7);
+
+            // placera ut alla vita bönder dynamiskt
             for (int col = 0; col < 8; col++)
-                squares[6, col].Content = "♙";
+            {
+                board[6, col] = new Pawn("White", 6, col);
+            }
 
-            // placera ut vita pjäser som inte är bönder
-            squares[7, 0].Content = "♖";
-            squares[7, 1].Content = "♘";
-            squares[7, 2].Content = "♗";
-            squares[7, 3].Content = "♕";
-            squares[7, 4].Content = "♔";
-            squares[7, 5].Content = "♗";
-            squares[7, 6].Content = "♘";
-            squares[7, 7].Content = "♖";
         }
-
-        
-    }
+    } 
 }
+
