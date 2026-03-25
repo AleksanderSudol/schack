@@ -19,7 +19,7 @@ namespace schack
             Row = row;
             Col = col;
         }
-        //[,] eftersom det är en 2d array.
+        //[,] eftersom det är en 2d array.  
         public abstract bool IsValidMove(int newRow, int newCol, Piece[,] board);
     }
 }

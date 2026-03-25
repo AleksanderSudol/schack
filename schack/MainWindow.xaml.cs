@@ -18,8 +18,12 @@ namespace schack
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Piece selectedPiece = null;
+        private int selectedRow = -1;
+        private int selectedCol = -1;
         private Button[,] squares = new Button[8, 8];
         private Piece[,] board = new Piece[8, 8];
+
         public MainWindow()
         {
            
@@ -50,12 +54,19 @@ namespace schack
                     Grid.SetRow(square, row);
                     Grid.SetColumn(square, col);
 
-                    chessboard.Children.Add(square);
+                    square.Click += Square_Click;
 
+                    // Tag för att hålla koll på positionen av pjäs
+                    square.Tag = new Point(row, col);
+
+                    chessboard.Children.Add(square);
                     squares[row, col] = square;
+
                 }
             }
             }
+
+
         private void RefreshBoard()
         {
             for (int row = 0; row < 8; row++)
@@ -77,8 +88,8 @@ namespace schack
         }
         private void InitializeGame()
         {
-            // Black Pieces
-   
+            // svarta pjjäserna
+
 
             board[0, 0] = new Rook("Black", 0, 0);
             board[0, 1] = new Knight("Black", 0, 1);
@@ -110,6 +121,43 @@ namespace schack
                 board[6, col] = new Pawn("White", 6, col);
             }
 
+        }
+        private void Square_Click(object sender, RoutedEventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+            Point pos = (Point)clickedButton.Tag;
+            int row = (int)pos.X;
+            int col = (int)pos.Y;
+
+            if (selectedPiece == null)
+            {
+                // 
+                if (board[row, col] != null)
+                {
+                    selectedPiece = board[row, col];
+                    selectedRow = row;
+                    selectedCol = col;
+
+                }
+            }
+            else
+            {
+                // kollar om det är ett gyltigt drag
+                if (selectedPiece.IsValidMove(row, col, board))
+                {
+                    // Updaterar brädan visuellt
+                    board[row, col] = selectedPiece;
+                    board[selectedRow, selectedCol] = null;
+
+                    // Updaterar pjäsens position
+                    selectedPiece.Row = row;
+                    selectedPiece.Col = col;
+                }
+
+                // 
+                selectedPiece = null;
+                RefreshBoard();
+            }
         }
     } 
 }
