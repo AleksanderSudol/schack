@@ -10,7 +10,8 @@ namespace schack
             : base(color, row, col)
         {
         }
-                    public override string Symbol
+        
+        public override string Symbol
         {
             get
             {

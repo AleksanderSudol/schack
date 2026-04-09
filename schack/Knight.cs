@@ -10,20 +10,35 @@ namespace schack
             : base(color, row, col)
         {
         }
+
         public override string Symbol
         {
             get
             {
-                // en enklare if else sats, om färgen är vit så används vita unicode, annars används svarta unicode symbolen
                 return Color == "White" ? "♘" : "♞";
             }
         }
 
         public override bool IsValidMove(int newRow, int newCol, Piece[,] board)
         {
+            int rowDiff = Math.Abs(newRow - Row);
+            int colDiff = Math.Abs(newCol - Col);
 
+            bool isValidLShape = (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
+
+            if (!isValidLShape)
+            {
+                return false;
+            }
+            
+            Piece targetPiece = board[newRow, newCol];
+            if (targetPiece != null && targetPiece.Color == this.Color)
+            {
+                return false;
+            }
+
+         
             return true;
         }
     }
 }
-
