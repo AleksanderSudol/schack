@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,11 +14,14 @@ using System.Windows.Shapes;
 
 namespace schack
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
+        // uppdaterar listan automatiskt
+        public ObservableCollection<Drag> MoveHistory { get; set; } = new ObservableCollection<Drag>();
+        private int currentTurnNumber = 1;
+
+        private string currentTurn = "White";
         private Piece selectedPiece = null;
         private int selectedRow = -1;
         private int selectedCol = -1;
@@ -26,15 +30,15 @@ namespace schack
 
         public MainWindow()
         {
-           
+
             InitializeComponent();
+            this.DataContext = this;
             createChessboard();
             InitializeGame();
             RefreshBoard();
 
-
-
         }
+        //visuella bräddan
         private void createChessboard()
         {
             for (int row = 0; row < 8; row++)
@@ -64,7 +68,7 @@ namespace schack
 
                 }
             }
-            }
+        }
 
 
         private void RefreshBoard()
@@ -88,7 +92,7 @@ namespace schack
         }
         private void InitializeGame()
         {
-            // svarta pjjäserna
+            // svarta pjäserna
 
 
             board[0, 0] = new Rook("Black", 0, 0);
@@ -131,34 +135,100 @@ namespace schack
 
             if (selectedPiece == null)
             {
-                // 
-                if (board[row, col] != null)
+                // kollar om det finns en pjäs där och om det är din tur
+                if (board[row, col] != null && board[row, col].Color == currentTurn)
                 {
                     selectedPiece = board[row, col];
                     selectedRow = row;
                     selectedCol = col;
-
                 }
             }
             else
             {
-                // kollar om det är ett gyltigt drag
+                // kollar om det är ett giltigt drag
                 if (selectedPiece.IsValidMove(row, col, board))
                 {
-                    // Updaterar brädan visuellt
+                   
+                    string moveNotation = GenerateMoveNotation(selectedPiece, row, col);
+
+                    if (currentTurn == "White")
+                    {
+                        
+                        MoveHistory.Add(new Drag
+                        {
+                            TurnNumber = currentTurnNumber,
+                            WhiteMove = moveNotation,
+                            BlackMove = ""
+                        });
+                    }
+                    else
+                    {
+                       
+                        var lastTurn = MoveHistory[MoveHistory.Count - 1];
+                        lastTurn.BlackMove = moveNotation;
+
+                        // skriver vilket drag det var
+                        MoveHistory[MoveHistory.Count - 1] = lastTurn;
+                        currentTurnNumber++;
+                    }
+
+                    // Uppdaterar brädan visuellt
                     board[row, col] = selectedPiece;
                     board[selectedRow, selectedCol] = null;
 
-                    // Updaterar pjäsens position
+                    // Uppdaterar pjäsens position
                     selectedPiece.Row = row;
                     selectedPiece.Col = col;
+
+                    // Byter tur
+                    if (currentTurn == "White")
+                    {
+                        currentTurn = "Black";
+                    }
+                    else
+                    {
+                        currentTurn = "White";
+                    }
                 }
 
-                // 
                 selectedPiece = null;
                 RefreshBoard();
             }
         }
-    } 
+        // översätter till schackspråk
+        private string GetSquareName(int row, int col)
+        {
+            
+            char file = (char)('a' + col);
+
+            int rank = 8 - row;
+
+            return $"{file}{rank}";
+        }
+
+        // skapar själva strängen som representerar draget i schacknotation
+        private string GenerateMoveNotation(Piece piece, int toRow, int toCol)
+        {
+            string squareName = GetSquareName(toRow, toCol);
+
+            // bönderna skrivs bara ut som rutans namn
+            if (piece.GetType().Name == "Pawn")
+            {
+                return squareName;
+            }
+
+            // K är upptaget av kungen så knight får N
+            if (piece.GetType().Name == "Knight")
+            {
+                return "N" + squareName; // e.g., "Nf3"
+            }
+
+            
+            //Tar första bokstaven av de resterande pjäserna
+            string pieceLetter = piece.GetType().Name.Substring(0, 1);
+
+            return pieceLetter + squareName;
+        }
+    }
 }
 

@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../SchackApi/SchackApi/SchackApi.csproj" />
   <Project Path="schack/schack.csproj" />
 </Solution>

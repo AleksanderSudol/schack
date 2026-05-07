@@ -6,7 +6,10 @@
         xmlns:local="clr-namespace:schack"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="600">
+    
+    
     <Grid x:Name="chessboard">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
