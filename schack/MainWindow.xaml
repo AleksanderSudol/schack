@@ -5,34 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:schack"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="600">
-    
-    
-    <Grid x:Name="chessboard">
-
+        Title="Schack med API" Height="600" Width="850">
+    <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-
         </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-            
         
+        <Grid x:Name="chessboard" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+        </Grid>
+
+
+        <ListView Grid.Column="1" ItemsSource="{Binding MoveHistory}" Margin="10" Background="Beige">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="#" DisplayMemberBinding="{Binding TurnNumber}" Width="40"/>
+                    <GridViewColumn Header="Vit" DisplayMemberBinding="{Binding WhiteMove}" Width="80"/>
+                    <GridViewColumn Header="Svart" DisplayMemberBinding="{Binding BlackMove}" Width="80"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
     </Grid>
 </Window>

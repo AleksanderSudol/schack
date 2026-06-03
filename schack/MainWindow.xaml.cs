@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
@@ -11,10 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-
 namespace schack
 {
-
     public partial class MainWindow : Window
     {
         // uppdaterar listan automatiskt
@@ -28,16 +27,18 @@ namespace schack
         private Button[,] squares = new Button[8, 8];
         private Piece[,] board = new Piece[8, 8];
 
+        // === NÄTVERK: Verktyg för att skicka data över internet ===
+        private static readonly System.Net.Http.HttpClient _client = new System.Net.Http.HttpClient();
+
         public MainWindow()
         {
-
             InitializeComponent();
             this.DataContext = this;
             createChessboard();
             InitializeGame();
             RefreshBoard();
-
         }
+
         //visuella bräddan
         private void createChessboard()
         {
@@ -65,11 +66,9 @@ namespace schack
 
                     chessboard.Children.Add(square);
                     squares[row, col] = square;
-
                 }
             }
         }
-
 
         private void RefreshBoard()
         {
@@ -90,11 +89,10 @@ namespace schack
                 }
             }
         }
+
         private void InitializeGame()
         {
             // svarta pjäserna
-
-
             board[0, 0] = new Rook("Black", 0, 0);
             board[0, 1] = new Knight("Black", 0, 1);
             board[0, 2] = new Bishop("Black", 0, 2);
@@ -124,9 +122,10 @@ namespace schack
             {
                 board[6, col] = new Pawn("White", 6, col);
             }
-
         }
-        private void Square_Click(object sender, RoutedEventArgs e)
+
+        // MAsync för att inte frysa UIet
+        private async void Square_Click(object sender, RoutedEventArgs e)
         {
             Button clickedButton = (Button)sender;
             Point pos = (Point)clickedButton.Tag;
@@ -148,12 +147,10 @@ namespace schack
                 // kollar om det är ett giltigt drag
                 if (selectedPiece.IsValidMove(row, col, board))
                 {
-                   
                     string moveNotation = GenerateMoveNotation(selectedPiece, row, col);
 
                     if (currentTurn == "White")
                     {
-                        
                         MoveHistory.Add(new Drag
                         {
                             TurnNumber = currentTurnNumber,
@@ -163,13 +160,36 @@ namespace schack
                     }
                     else
                     {
-                       
+                        // 1. Hämta ut sista draget från listan
                         var lastTurn = MoveHistory[MoveHistory.Count - 1];
+
+                        // 2. Uppdatera svarts drag i minnet
                         lastTurn.BlackMove = moveNotation;
 
-                        // skriver vilket drag det var
-                        MoveHistory[MoveHistory.Count - 1] = lastTurn;
+                        // 3. Ta bort den gamla raden och lägg till den uppdaterade raden igen.
+                        // Detta tvingar listan på skärmen att rita om raden och visa svarts drag!
+                        MoveHistory.RemoveAt(MoveHistory.Count - 1);
+                        MoveHistory.Add(lastTurn);
+
                         currentTurnNumber++;
+                    }
+
+                    // === NÄTVERK: Paketera draget i din schackDrag-modell ===
+                    var networkMove = new schackDrag
+                    {
+                        TurnColor = currentTurn,
+                        Notation = moveNotation
+                    };
+
+                    try
+                    {
+                        
+                        await System.Net.Http.Json.HttpClientJsonExtensions.PostAsJsonAsync(_client, "https://localhost:7293/api/moves", networkMove);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Visar felmeddelande i stället för att krascha spelet om API:et inte körs
+                        MessageBox.Show("Kunde inte skicka draget till API:et: " + ex.Message);
                     }
 
                     // Uppdaterar brädan visuellt
@@ -195,14 +215,12 @@ namespace schack
                 RefreshBoard();
             }
         }
+
         // översätter till schackspråk
         private string GetSquareName(int row, int col)
         {
-            
             char file = (char)('a' + col);
-
             int rank = 8 - row;
-
             return $"{file}{rank}";
         }
 
@@ -223,12 +241,16 @@ namespace schack
                 return "N" + squareName; // e.g., "Nf3"
             }
 
-            
             //Tar första bokstaven av de resterande pjäserna
             string pieceLetter = piece.GetType().Name.Substring(0, 1);
-
             return pieceLetter + squareName;
         }
     }
-}
 
+    // === NÄTVERK: Lokal spegling av din API-modell så att WPF kan paketera datan ===
+    public class schackDrag
+    {
+        public string TurnColor { get; set; }
+        public string Notation { get; set; }
+    }
+}
