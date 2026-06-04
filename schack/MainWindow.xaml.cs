@@ -200,14 +200,18 @@ namespace schack
                     selectedPiece.Row = row;
                     selectedPiece.Col = col;
 
-                    // Byter tur
+                    // Byter tur och uppdaterar texten för vems tur det är
                     if (currentTurn == "White")
                     {
                         currentTurn = "Black";
+                        txtCurrentTurn.Text = "Svarts tur";
+
                     }
                     else
                     {
                         currentTurn = "White";
+                        txtCurrentTurn.Text = "Vits tur";
+ 
                     }
                 }
 
@@ -247,7 +251,6 @@ namespace schack
         }
     }
 
-    // === NÄTVERK: Lokal spegling av din API-modell så att WPF kan paketera datan ===
     public class schackDrag
     {
         public string TurnColor { get; set; }

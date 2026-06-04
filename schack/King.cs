@@ -21,6 +21,22 @@ namespace schack
 
         public override bool IsValidMove(int newRow, int newCol, Piece[,] board)
         {
+            int rowDiff = Math.Abs(newRow - Row);
+            int colDiff = Math.Abs(newCol - Col);
+
+
+            if (rowDiff > 1 || colDiff > 1)
+            {
+                return false; 
+            }
+
+ 
+            Piece targetPiece = board[newRow, newCol];
+            if (targetPiece != null && targetPiece.Color == this.Color)
+            {
+                return false;
+            }
+
 
             return true;
         }

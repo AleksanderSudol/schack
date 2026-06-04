@@ -37,15 +37,26 @@
         </Grid>
 
 
-        <ListView Grid.Column="1" ItemsSource="{Binding MoveHistory}" Margin="10" Background="Beige">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="#" DisplayMemberBinding="{Binding TurnNumber}" Width="40"/>
-                    <GridViewColumn Header="Vit" DisplayMemberBinding="{Binding WhiteMove}" Width="80"/>
-                    <GridViewColumn Header="Svart" DisplayMemberBinding="{Binding BlackMove}" Width="80"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <StackPanel Grid.Column="1" Margin="10">
+
+            <TextBlock x:Name="txtCurrentTurn" 
+               Text="Vits tur" 
+               FontSize="22" 
+               FontWeight="Bold" 
+               Foreground="Black" 
+               HorizontalAlignment="Center" 
+               Margin="0,0,0,15"/>
+
+            <ListView ItemsSource="{Binding MoveHistory}" Background="Beige" Height="480">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="#" DisplayMemberBinding="{Binding TurnNumber}" Width="40"/>
+                        <GridViewColumn Header="Vit" DisplayMemberBinding="{Binding WhiteMove}" Width="90"/>
+                        <GridViewColumn Header="Svart" DisplayMemberBinding="{Binding BlackMove}" Width="90"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
 
     </Grid>
 </Window>
